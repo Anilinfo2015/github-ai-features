@@ -98,6 +98,10 @@ public class OrderService : IOrderService
         
         if (updateOrderDto.TotalAmount.HasValue)
         {
+            if (updateOrderDto.TotalAmount.Value <= 0)
+            {
+                throw new ArgumentException("TotalAmount must be greater than zero", nameof(updateOrderDto));
+            }
             existingOrder.TotalAmount = updateOrderDto.TotalAmount.Value;
         }
         
