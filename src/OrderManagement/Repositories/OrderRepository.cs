@@ -44,7 +44,18 @@ public class OrderRepository : IOrderRepository
 
             var query = new QueryExpression(EntityName)
             {
-                ColumnSet = new ColumnSet(true)
+                ColumnSet = new ColumnSet(
+                    IdField,
+                    OrderNumberField,
+                    CustomerNameField,
+                    CustomerEmailField,
+                    TotalAmountField,
+                    StatusField,
+                    ShippingAddressField,
+                    DescriptionField,
+                    "createdon",
+                    "modifiedon"
+                )
             };
 
             var result = await Task.Run(() => _dataverseConnection.Client.RetrieveMultiple(query));
