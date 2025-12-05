@@ -1,0 +1,44 @@
+@OrderManagement_HostAddress = http://localhost:5263
+
+### Get all orders
+GET {{OrderManagement_HostAddress}}/api/orders
+Accept: application/json
+
+### Get order by ID (replace with actual GUID)
+GET {{OrderManagement_HostAddress}}/api/orders/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+### Create new order
+POST {{OrderManagement_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-001",
+  "customerName": "John Doe",
+  "customerEmail": "john.doe@example.com",
+  "totalAmount": 150.00,
+  "shippingAddress": "123 Main St, City, Country",
+  "description": "Sample order"
+}
+
+### Update order (replace with actual GUID)
+PUT {{OrderManagement_HostAddress}}/api/orders/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "customerName": "John Updated",
+  "status": 2,
+  "totalAmount": 175.00
+}
+
+### Delete order (replace with actual GUID)
+DELETE {{OrderManagement_HostAddress}}/api/orders/00000000-0000-0000-0000-000000000000
+
+### Get orders by status (0=Pending, 1=Confirmed, 2=Processing, 3=Shipped, 4=Delivered, 5=Cancelled)
+GET {{OrderManagement_HostAddress}}/api/orders/status/0
+Accept: application/json
+
+### Get orders by customer name
+GET {{OrderManagement_HostAddress}}/api/orders/customer/John
+Accept: application/json
+
