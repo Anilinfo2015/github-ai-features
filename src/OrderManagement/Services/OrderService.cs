@@ -85,44 +85,29 @@ public class OrderService : IOrderService
             return null;
         }
 
-        // Update only provided fields
-        if (!string.IsNullOrEmpty(updateOrderDto.CustomerName))
-        {
-            existingOrder.CustomerName = updateOrderDto.CustomerName;
-        }
+        // Update only provided fields using helper methods
+        UpdateIfProvided(updateOrderDto.CustomerName, v => existingOrder.CustomerName = v);
+        UpdateIfProvided(updateOrderDto.CustomerEmail, v => existingOrder.CustomerEmail = v);
+        UpdateIfProvided(updateOrderDto.ShippingAddress, v => existingOrder.ShippingAddress = v);
+        UpdateIfProvided(updateOrderDto.Description, v => existingOrder.Description = v);
         
-        if (!string.IsNullOrEmpty(updateOrderDto.CustomerEmail))
+        UpdateIfProvided(updateOrderDto.TotalAmount, v =>
         {
-            existingOrder.CustomerEmail = updateOrderDto.CustomerEmail;
-        }
-        
-        if (updateOrderDto.TotalAmount.HasValue)
-        {
-            if (updateOrderDto.TotalAmount.Value <= 0)
+            if (v <= 0)
             {
                 throw new ArgumentException("TotalAmount must be greater than zero", nameof(updateOrderDto));
             }
-            existingOrder.TotalAmount = updateOrderDto.TotalAmount.Value;
-        }
+            existingOrder.TotalAmount = v;
+        });
         
-        if (updateOrderDto.Status.HasValue)
+        UpdateIfProvided(updateOrderDto.Status, v =>
         {
-            if (!Enum.IsDefined(typeof(OrderStatus), updateOrderDto.Status.Value))
+            if (!Enum.IsDefined(typeof(OrderStatus), v))
             {
-                throw new ArgumentException($"Invalid status value: {updateOrderDto.Status.Value}", nameof(updateOrderDto));
+                throw new ArgumentException($"Invalid status value: {v}", nameof(updateOrderDto));
             }
-            existingOrder.Status = (OrderStatus)updateOrderDto.Status.Value;
-        }
-        
-        if (!string.IsNullOrEmpty(updateOrderDto.ShippingAddress))
-        {
-            existingOrder.ShippingAddress = updateOrderDto.ShippingAddress;
-        }
-        
-        if (!string.IsNullOrEmpty(updateOrderDto.Description))
-        {
-            existingOrder.Description = updateOrderDto.Description;
-        }
+            existingOrder.Status = (OrderStatus)v;
+        });
 
         existingOrder.ModifiedOn = DateTime.UtcNow;
 
@@ -131,6 +116,28 @@ public class OrderService : IOrderService
         _logger.LogInformation("Successfully updated order {OrderId}", id);
         
         return MapToDto(updatedOrder);
+    }
+
+    /// <summary>
+    /// Updates a field if the provided value is not null or empty.
+    /// </summary>
+    private static void UpdateIfProvided(string? newValue, Action<string> updateAction)
+    {
+        if (!string.IsNullOrEmpty(newValue))
+        {
+            updateAction(newValue);
+        }
+    }
+
+    /// <summary>
+    /// Updates a field if the provided nullable value has a value.
+    /// </summary>
+    private static void UpdateIfProvided<T>(T? newValue, Action<T> updateAction) where T : struct
+    {
+        if (newValue.HasValue)
+        {
+            updateAction(newValue.Value);
+        }
     }
 
     /// <summary>

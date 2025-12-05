@@ -44,18 +44,7 @@ public class OrderRepository : IOrderRepository
 
             var query = new QueryExpression(EntityName)
             {
-                ColumnSet = new ColumnSet(
-                    IdField,
-                    OrderNumberField,
-                    CustomerNameField,
-                    CustomerEmailField,
-                    TotalAmountField,
-                    StatusField,
-                    ShippingAddressField,
-                    DescriptionField,
-                    "createdon",
-                    "modifiedon"
-                )
+                ColumnSet = GetRequiredColumnSet()
             };
 
             var result = await Task.Run(() => _dataverseConnection.Client.RetrieveMultiple(query));
@@ -79,7 +68,7 @@ public class OrderRepository : IOrderRepository
             _logger.LogInformation("Retrieving order {OrderId} from Dataverse", id);
 
             var entity = await Task.Run(() => 
-                _dataverseConnection.Client.Retrieve(EntityName, id, new ColumnSet(true)));
+                _dataverseConnection.Client.Retrieve(EntityName, id, GetRequiredColumnSet()));
 
             return entity != null ? MapToOrder(entity) : null;
         }
@@ -178,7 +167,7 @@ public class OrderRepository : IOrderRepository
 
             var query = new QueryExpression(EntityName)
             {
-                ColumnSet = new ColumnSet(true),
+                ColumnSet = GetRequiredColumnSet(),
                 Criteria = new FilterExpression
                 {
                     Conditions =
@@ -208,14 +197,17 @@ public class OrderRepository : IOrderRepository
         {
             _logger.LogInformation("Retrieving orders for customer {CustomerName} from Dataverse", customerName);
 
+            // Sanitize customer name to prevent LIKE injection attacks
+            var sanitizedCustomerName = SanitizeForLikeQuery(customerName);
+
             var query = new QueryExpression(EntityName)
             {
-                ColumnSet = new ColumnSet(true),
+                ColumnSet = GetRequiredColumnSet(),
                 Criteria = new FilterExpression
                 {
                     Conditions =
                     {
-                        new ConditionExpression(CustomerNameField, ConditionOperator.Like, $"%{customerName}%")
+                        new ConditionExpression(CustomerNameField, ConditionOperator.Like, $"%{sanitizedCustomerName}%")
                     }
                 }
             };
@@ -229,6 +221,42 @@ public class OrderRepository : IOrderRepository
             _logger.LogError(ex, "Error retrieving orders by customer name from Dataverse");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Sanitizes a string for use in LIKE queries by escaping special characters.
+    /// </summary>
+    private static string SanitizeForLikeQuery(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // Escape special characters that have meaning in LIKE queries
+        return input
+            .Replace("[", "[[]")
+            .Replace("%", "[%]")
+            .Replace("_", "[_]");
+    }
+
+    /// <summary>
+    /// Gets the ColumnSet with only the required columns for order queries.
+    /// </summary>
+    private static ColumnSet GetRequiredColumnSet()
+    {
+        return new ColumnSet(
+            IdField,
+            OrderNumberField,
+            CustomerNameField,
+            CustomerEmailField,
+            TotalAmountField,
+            StatusField,
+            ShippingAddressField,
+            DescriptionField,
+            "createdon",
+            "modifiedon"
+        );
     }
 
     /// <summary>
