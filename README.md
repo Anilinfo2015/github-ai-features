@@ -60,6 +60,11 @@ Configure Dataverse connection in `appsettings.json`:
 }
 ```
 
+> **Security Note:** For production deployments, do NOT commit real credentials to source control. Use environment variables, Azure Key Vault, or other secure secret management solutions. Consider using:
+> - Environment variables: `DATAVERSE__URL`, `DATAVERSE__CLIENTID`, etc.
+> - Azure Key Vault for secure secret storage
+> - User secrets for local development (`dotnet user-secrets`)
+
 ### Azure AD App Registration
 
 1. Register an application in Azure AD
