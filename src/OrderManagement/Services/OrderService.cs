@@ -107,6 +107,10 @@ public class OrderService : IOrderService
         
         if (updateOrderDto.Status.HasValue)
         {
+            if (!Enum.IsDefined(typeof(OrderStatus), updateOrderDto.Status.Value))
+            {
+                throw new ArgumentException($"Invalid status value: {updateOrderDto.Status.Value}", nameof(updateOrderDto));
+            }
             existingOrder.Status = (OrderStatus)updateOrderDto.Status.Value;
         }
         
