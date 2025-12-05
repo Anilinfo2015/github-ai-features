@@ -34,18 +34,15 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 var app = builder.Build();
 
 // Initialize Dataverse connection on startup
-using (var scope = app.Services.CreateScope())
+var dataverseConnection = app.Services.GetRequiredService<IDataverseConnection>();
+try
 {
-    var dataverseConnection = scope.ServiceProvider.GetRequiredService<IDataverseConnection>();
-    try
-    {
-        await dataverseConnection.ConnectAsync();
-    }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogWarning(ex, "Failed to connect to Dataverse on startup. Connection will be retried on first request.");
-    }
+    await dataverseConnection.ConnectAsync();
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogWarning(ex, "Failed to connect to Dataverse on startup. Connection will be retried on first request.");
 }
 
 // Configure the HTTP request pipeline.
