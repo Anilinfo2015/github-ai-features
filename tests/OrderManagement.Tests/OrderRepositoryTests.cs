@@ -97,14 +97,14 @@ public class OrderRepositoryMappingTests
 
         // Arrange
         var entityId = Guid.NewGuid();
-        var entity = new Entity("cr_order", entityId);
-        entity["cr_ordernumber"] = "ORD-001";
-        entity["cr_customername"] = "John Doe";
-        entity["cr_customeremail"] = "john@example.com";
-        entity["cr_totalamount"] = new Money(150.50m);
-        entity["cr_status"] = new OptionSetValue(1); // Confirmed
-        entity["cr_shippingaddress"] = "123 Main St";
-        entity["cr_description"] = "Test order";
+        var entity = new Entity("crd4d_cr_order", entityId);
+        entity["crd4d_ordernumber"] = "ORD-001";
+        entity["crd4d_customername"] = "John Doe";
+        entity["crd4d_customeremail"] = "john@example.com";
+        entity["crd4d_totalamount"] = 150.50m;
+        entity["crd4d_status"] = 1; // Confirmed
+        entity["crd4d_shippingaddress"] = "123 Main St";
+        entity["crd4d_description"] = "Test order";
         entity["createdon"] = new DateTime(2024, 1, 15, 10, 30, 0);
         entity["modifiedon"] = new DateTime(2024, 1, 16, 14, 45, 0);
 
@@ -137,7 +137,7 @@ public class OrderRepositoryMappingTests
 
         // Arrange
         var entityId = Guid.NewGuid();
-        var entity = new Entity("cr_order", entityId);
+        var entity = new Entity("crd4d_cr_order", entityId);
         // Leave all attributes null
 
         // Act
@@ -185,13 +185,13 @@ public class OrderRepositoryMappingTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("cr_order", result.LogicalName);
-        Assert.Equal("ORD-002", result["cr_ordernumber"]);
-        Assert.Equal("Jane Smith", result["cr_customername"]);
-        Assert.Equal("jane@example.com", result["cr_customeremail"]);
-        Assert.Equal(250.75m, ((Money)result["cr_totalamount"]).Value);
-        Assert.Equal(2, ((OptionSetValue)result["cr_status"]).Value); // Processing = 2
-        Assert.Equal("456 Oak Ave", result["cr_shippingaddress"]);
-        Assert.Equal("Another test order", result["cr_description"]);
+        Assert.Equal("crd4d_cr_order", result.LogicalName);
+        Assert.Equal("ORD-002", result["crd4d_ordernumber"]);
+        Assert.Equal("Jane Smith", result["crd4d_customername"]);
+        Assert.Equal("jane@example.com", result["crd4d_customeremail"]);
+        Assert.Equal(250.75m, result["crd4d_totalamount"]);
+        Assert.Equal(2, (int)result["crd4d_status"]); // Processing = 2
+        Assert.Equal("456 Oak Ave", result["crd4d_shippingaddress"]);
+        Assert.Equal("Another test order", result["crd4d_description"]);
     }
 }

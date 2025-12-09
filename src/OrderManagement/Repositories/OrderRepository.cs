@@ -14,15 +14,15 @@ public class OrderRepository : IOrderRepository
     private readonly ILogger<OrderRepository> _logger;
 
     // Dataverse entity and attribute names for the custom Order entity
-    private const string EntityName = "cr_order";
-    private const string IdField = "cr_orderid";
-    private const string OrderNumberField = "cr_ordernumber";
-    private const string CustomerNameField = "cr_customername";
-    private const string CustomerEmailField = "cr_customeremail";
-    private const string TotalAmountField = "cr_totalamount";
-    private const string StatusField = "cr_status";
-    private const string ShippingAddressField = "cr_shippingaddress";
-    private const string DescriptionField = "cr_description";
+    private const string EntityName = "crd4d_cr_order";
+    private const string IdField = "crd4d_orderid";
+    private const string OrderNumberField = "crd4d_ordernumber";
+    private const string CustomerNameField = "crd4d_customername";
+    private const string CustomerEmailField = "crd4d_customeremail";
+    private const string TotalAmountField = "crd4d_totalamount";
+    private const string StatusField = "crd4d_status";
+    private const string ShippingAddressField = "crd4d_shippingaddress";
+    private const string DescriptionField = "crd4d_description";
 
     /// <summary>
     /// Initializes a new instance of the OrderRepository class.
@@ -270,8 +270,8 @@ public class OrderRepository : IOrderRepository
             OrderNumber = entity.GetAttributeValue<string>(OrderNumberField) ?? string.Empty,
             CustomerName = entity.GetAttributeValue<string>(CustomerNameField) ?? string.Empty,
             CustomerEmail = entity.GetAttributeValue<string>(CustomerEmailField) ?? string.Empty,
-            TotalAmount = entity.GetAttributeValue<Money>(TotalAmountField)?.Value ?? 0m,
-            Status = (OrderStatus)(entity.GetAttributeValue<OptionSetValue>(StatusField)?.Value ?? 0),
+            TotalAmount = entity.GetAttributeValue<decimal>(TotalAmountField),
+            Status = (OrderStatus)(entity.GetAttributeValue<int>(StatusField)),
             ShippingAddress = entity.GetAttributeValue<string>(ShippingAddressField) ?? string.Empty,
             Description = entity.GetAttributeValue<string>(DescriptionField) ?? string.Empty,
             CreatedOn = entity.GetAttributeValue<DateTime?>("createdon") ?? DateTime.MinValue,
@@ -289,8 +289,8 @@ public class OrderRepository : IOrderRepository
         entity[OrderNumberField] = order.OrderNumber;
         entity[CustomerNameField] = order.CustomerName;
         entity[CustomerEmailField] = order.CustomerEmail;
-        entity[TotalAmountField] = new Money(order.TotalAmount);
-        entity[StatusField] = new OptionSetValue((int)order.Status);
+        entity[TotalAmountField] = order.TotalAmount;
+        entity[StatusField] = (int)order.Status;
         entity[ShippingAddressField] = order.ShippingAddress;
         entity[DescriptionField] = order.Description;
 
