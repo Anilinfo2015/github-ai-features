@@ -30,6 +30,8 @@ builder.Services.AddSingleton<IDataverseConnection, DataverseConnection>();
 // Register Repository and Service
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 var app = builder.Build();
 
